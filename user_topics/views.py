@@ -1,4 +1,5 @@
 from django import forms
+from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, ListView, DetailView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -49,13 +50,29 @@ class Topics(ListView):
     paginate_by = 16
 
     def get_queryset(self):
-        return Post.objects.filter(user__username=self.kwargs['username']).order_by('-created_on')
+        posts = Post.objects.filter(
+            user__username=self.kwargs['username'],
+        )
+        self.selected_topic = None
+        topic_id = self.request.GET.get('topic')
+        if topic_id:
+            if not topic_id.isascii() or not topic_id.isdecimal():
+                from django.http import Http404
+                raise Http404('Unknown topic')
+            self.selected_topic = get_object_or_404(
+                Topic, pk=topic_id,
+                knowledge__user__username=self.kwargs['username'],
+                knowledge__name=self.kwargs['knowledge'],
+            )
+            posts = posts.filter(categories__topic=self.selected_topic)
+        return posts.distinct().order_by('-created_on', '-pk')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['username'] = self.kwargs.get('username')
         context['knowledge'] = self.kwargs.get('knowledge')
         context['object_list'] = get_extended_queryset_topic(self)
+        context['selected_topic'] = self.selected_topic
         return context
 
 

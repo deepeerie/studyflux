@@ -9,13 +9,7 @@
 {% block sub_style %}
     <link rel="stylesheet" type="text/css" href="{% static 'topic_style.css' %}"/> {# CSS style from app #}
 
-    <style>
-        {% for topic in object_list %}
-            input[id="{{ topic.0.title|slugify }}"]:checked ~ .cards_topics > div:not(.{{ topic.0.title|slugify }}) {
-                display: none;
-            }
-        {% endfor %}
-    </style>
+
 {% endblock %}
 
 {% block page_title %}| TOPICS{% endblock %}
@@ -33,19 +27,14 @@
 
 {% block page_content %}
     <hr>
-<body>
+
     <div class="my_content">
         <div class="topics">
-            <label for="All"> All </label>
+            <a href="?"{% if not selected_topic %} class="active" aria-current="page"{% endif %}>All</a>
             {% for topic in object_list %}
-                <label for="{{ topic.0.title|slugify }}">{{ topic.0.title|slugify }}</label>
+                <a href="?topic={{ topic.0.pk }}"{% if selected_topic.pk == topic.0.pk %} class="active" aria-current="page"{% endif %}>{{ topic.0.title }}</a>
             {% endfor %}
         </div>
-
-        <input type="radio" id="All" name="r1">
-        {% for topic in object_list %}
-            <input type="radio" id="{{ topic.0.title|slugify }}" name="r1">
-        {% endfor %}
 
         <div class="cards_topics">
             {% if not posts and user.username == username and object_list%} 
@@ -58,7 +47,7 @@
                 <h5 style="color: rgb(112, 112, 112);text-align: center;width: 100%;margin: 20px;"> The user has no posts and topic :( </h3>
             {%endif%}
             {% for post in posts %}
-                <div class="topic {% for topic in post.categories.all %} {{ topic.name|slugify }} {% endfor %}">
+                <div class="topic">
                     <div class="img_container">
                         {% if post.image != '' %}
                             <img src={{ post.image.url }} onerror="this.src = '{% static 'img/noimg.jpg' %}';">
@@ -98,7 +87,7 @@
             <div class="pagination">
             {% if page_obj.has_previous %}
                 <div>
-                    <span><a href="?page={{ page_obj.previous_page_number }}">Previous&nbsp;</a></span>
+                    <span><a href="?page={{ page_obj.previous_page_number }}{% if selected_topic %}&amp;topic={{ selected_topic.pk }}{% endif %}">Previous&nbsp;</a></span>
                 </div>
             {% endif %}
                 <div class="">
@@ -106,11 +95,11 @@
                 </div>
             {% if page_obj.has_next %}
                 <div>
-                    <span><a href="?page={{ page_obj.next_page_number }}">&nbsp;Next</a></span>
+                    <span><a href="?page={{ page_obj.next_page_number }}{% if selected_topic %}&amp;topic={{ selected_topic.pk }}{% endif %}">&nbsp;Next</a></span>
                 </div>
             {% endif %}
             </div>
         {% endif %}
     </div>
-</body>
+
 {% endblock %}
