@@ -5,7 +5,7 @@ from .serializers import PostSerializer
 from .mixins import LikedMixin
 
 
-class PostViewSet(LikedMixin, viewsets.ModelViewSet):
+class PostViewSet(LikedMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )

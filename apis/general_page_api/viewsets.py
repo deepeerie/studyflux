@@ -6,7 +6,7 @@ from apis.general_page_api.serializers import PostSerializer
 from user_blog.models import Post
 
 
-class PostViewSet(viewsets.ModelViewSet):
+class PostViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = PageNumberPagination
     queryset = Post.objects.all().order_by('-created_on')
     serializer_class = PostSerializer
