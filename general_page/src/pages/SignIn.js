@@ -28,7 +28,7 @@ function SignIn({setAuth, setUser}) {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-CSRFToken': csrf_token
             },
-            body: 'user=' + JSON.stringify(state)
+            body: 'user=' + encodeURIComponent(JSON.stringify(state))
         })
             .then(response => response.json())
             .then(response => {

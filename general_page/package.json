@@ -4,8 +4,8 @@
   "description": "The starting point of the site",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --mode development ./src/index.js && rm -r -f static/dist && mv static/dist static",
-    "build": "webpack --mode production ./src/index.js && rm -r -f static/dist && mv static/dist static"
+    "dev": "webpack --mode development ./src/index.js --output-path ./static/dist",
+    "build": "webpack --mode production ./src/index.js --output-path ./static/dist"
   },
   "keywords": [],
   "author": "Dmitry Bulakh (eiire)",

@@ -42,7 +42,7 @@
                             {{ comment.date }}
                         </div>
                         <div >
-                            <div>{{ comment.body|safe }}</div>
+                            <div>{{ comment.body|linebreaksbr }}</div>
 
                             {% if form %}
                                 <a onclick="get_comment_form({{ comment.id }})"> &nbsp;&nbsp;Reply </a>

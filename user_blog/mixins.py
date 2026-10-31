@@ -13,7 +13,6 @@ class ModelFormPostMixin:
         'header': forms.Textarea(attrs={'cols': '100', 'rows': '5', 'class': 'form-control'}),
         'image': forms.FileInput(attrs={'type': 'file', 'class': 'form-control-file'}),
         'title': forms.Textarea(attrs={'cols': '100', 'rows': '1', 'class': 'form-control'}),
-        'body': forms.Textarea(attrs={'cols': '1000', 'rows': '10', 'class': 'form-control'})
     }
     labels = {'categories': 'Please equip the topic this post'}
     help_texts = {'categories': '(not required)'}

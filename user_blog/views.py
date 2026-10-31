@@ -106,19 +106,13 @@ class DetailArticleView(DetailView):
         post = get_object_or_404(Post, id=self.kwargs.get('post'))
 
         if form.is_valid():
-            comment = Comment()
-            comment.path = []
-            comment.post = post
-            comment.user = auth.get_user(self.request)
-            comment.body = form.cleaned_data['body']
-            comment.save()
-
-            try:
-                comment.path.extend(Comment.objects.get(id=form.cleaned_data['parent']).path)
-                comment.path.append(comment.id)
-            except ObjectDoesNotExist:
-                comment.path.append(comment.id)
-
+            parent_id = form.cleaned_data.get('parent')
+            parent = get_object_or_404(Comment, id=parent_id, post=post) if parent_id else None
+            comment = Comment.objects.create(
+                path=[], post=post, user=auth.get_user(self.request),
+                body=form.cleaned_data['body'],
+            )
+            comment.path = (parent.path if parent else []) + [comment.pk]
             comment.save()
 
         return redirect('article_detail', username=self.kwargs.get('username'), pk=post.pk)

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.urls import reverse
 from apis.general_page_api import services
 from apis.like_api import services as likes_services
 from user_blog.models import Post
@@ -74,4 +75,4 @@ class TopicSerializer(serializers.ModelSerializer):
         return knowledge
 
     def get_url(self, obj) -> str:
-        return f'users/@{obj.category.user}/blog/flows/Development/topic/{obj.title}/posts/'
+        return reverse('article_category', args=[obj.category.user.username, obj.knowledge.name, obj.title])

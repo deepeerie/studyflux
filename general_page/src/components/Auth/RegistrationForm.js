@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import InputMask from 'react-input-mask'
 import { connect } from 'react-redux'
-import fetch from '../functions/fetchWithTimeout'
+import fetch from '../functions/fetchWithTimeOut'
 import {setLoading, setSignUpStage, setUser} from "../../actions";
 import AlertText from "../Alert/AlertText";
 import { csrf_token } from '../vars'
@@ -41,7 +41,7 @@ function RegistrationForm({setLoading, setUser, setSignUpStage}) {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-CSRFToken': csrf_token
             },
-            body: 'user=' + JSON.stringify(state)
+            body: 'user=' + encodeURIComponent(JSON.stringify(state))
         })
             .then(response => response.json())
             .then(response => {

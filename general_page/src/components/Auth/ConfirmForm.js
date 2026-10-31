@@ -22,7 +22,7 @@ function ConfirmForm({user, setSignUpStage, setLoading, setUser, setAuth}) {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-CSRFToken': csrf_token
             },
-            body: 'user=' + JSON.stringify(user) + '&confirm_code=' + state.confirm_code
+            body: 'user=' + encodeURIComponent(JSON.stringify(user)) + '&confirm_code=' + state.confirm_code
         })
             .then(response => response.json())
             .then(response => {

@@ -31,7 +31,7 @@ class UserPageView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        return Post.objects.filter(user__username=self.kwargs.get('username'), pinned=True)
+        return Post.objects.filter(user__username=self.kwargs.get('username'), pinned=True).order_by('pk')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

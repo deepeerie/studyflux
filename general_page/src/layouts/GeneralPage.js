@@ -27,7 +27,7 @@ function GeneralPage({setAuth, setUser}) {
 
                 }
             })
-    })
+    }, [])
 
 
     return (

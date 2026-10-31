@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Post from "./Post";
 import { connect } from 'react-redux'
 import { setLoading } from "../../actions";
-import fetch from '../functions/fetchWithTimeout'
+import fetch from '../functions/fetchWithTimeOut'
 import '../../styles/general_page.css'
 import Cookies from 'js-cookie'
 

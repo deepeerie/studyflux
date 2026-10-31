@@ -1,27 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Like } from "./Like";
 import { connect } from "react-redux";
 
 function Post({post, auth}) {
     const [state, setState] = useState({
-        img: true,
+        img: Boolean(post.image),
     });
-
-     useEffect(() => {
-        fetch(post.image)
-            .then(response => {
-                if (response.status > 400)
-                    setState({img: false})
-
-                return response.json();
-            })
-    }, [])
 
     return (
          <div className="row">
             <div className="col-md-7" >
                 <a href={state.img ? post.image : '/static/img/noimg.jpg'}>
-                    <div className="img_container"> <img src={state.img ? post.image : '/static/img/noimg.jpg'} /> </div>
+                    <div className="img_container"> <img alt={post.title} onError={() => setState({img: false})} src={state.img ? post.image : '/static/img/noimg.jpg'} /> </div>
                 </a>
             </div>
 
@@ -31,7 +21,7 @@ function Post({post, auth}) {
                         <h3 href={post.url_post}> {post.title} </h3>
                     </div>
                     <div className="col-auto">
-                        <span class="text-lighten"> is an article written by </span> <a href={post.user_url}> {post.username} </a>
+                        <span className="text-lighten"> is an article written by </span> <a href={post.user_url}> {post.username} </a>
                     </div>
                 </div>
                 <small>
@@ -40,14 +30,14 @@ function Post({post, auth}) {
                         |&nbsp;Categories:&nbsp;
 
                         {post.topics.map(topic => {
-                            return <a href={topic.url}> {topic.title} </a>;
+                            return <a key={topic.id} href={topic.url}> {topic.title} </a>;
                         })}
                     </p>
                 </small>
 
                <p> {post.header} </p>
-               <div class="row d-flex justify-content-between align-items-center mt-5">
-                   <div class="col-auto">
+               <div className="row d-flex justify-content-between align-items-center mt-5">
+                   <div className="col-auto">
                        <a className="btn btn-primary" href={post.url}> View post </a>
                    </div>
                    <div className="col-auto">

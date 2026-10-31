@@ -30,3 +30,27 @@ Pipfile.lock
 /general_page/static/dist/
 /general_page/static/dist/
 /general_page/package-lock.json
+
+.venv/
+media/
+staticfiles/
+.local/
+.env
+
+# Track schema migrations and reproducible frontend installs.
+!user_topics/migrations/*.py
+!user_page/migrations/*.py
+!user_blog/migrations/*.py
+!general_page/migrations/*.py
+!/general_page/package-lock.json
+
+sync/
+
+# Local runtime and user content must never be published.
+__pycache__/
+*.py[cod]
+.DS_Store
+*.log
+*.dump
+.env.*
+!/general_page/static/dist/
