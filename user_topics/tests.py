@@ -11,34 +11,25 @@ class TopicFilterTests(TestCase):
     def setUpTestData(cls):
         cls.author = User.objects.create_user(username='topic-author')
         cls.stream = Knowledge.objects.create(user=cls.author, name='Main')
-        cls.other = Knowledge.objects.create(user=cls.author, name='Other')
-        cls.topic = Topic.objects.create(user=cls.author, knowledge=cls.stream, title='Русская тема')
-        cls.other_topic = Topic.objects.create(user=cls.author, knowledge=cls.other, title='Русская тема')
-        for i in range(17):
-            post = Post.objects.create(user=cls.author, knowledge_field=cls.stream, title=str(i))
-            post.categories.add(cls.topic.category)
-        cls.uncategorized = Post.objects.create(user=cls.author, knowledge_field=cls.stream, title='No topic')
-        cls.cross_stream = Post.objects.create(user=cls.author, knowledge_field=cls.other, title='Other stream')
-        cls.cross_stream.categories.add(cls.topic.category)
+        cls.topics = [Topic.objects.create(user=cls.author, knowledge=cls.stream, title=title)
+                      for title in ('Русская тема', 'Другая тема', 'Same!', 'Same?')]
+        for topic in cls.topics:
+            post = Post.objects.create(user=cls.author, knowledge_field=cls.stream, title=topic.title)
+            post.categories.add(topic.category)
         cls.url = reverse('project_index', args=[cls.author.username, cls.stream.name])
 
-    def test_cyrillic_topic_filter_and_pagination(self):
-        response = self.client.get(self.url, {'topic': self.topic.pk})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Русская тема')
-        self.assertContains(response, '?topic={}'.format(self.topic.pk))
-        self.assertEqual(response.context['paginator'].count, 18)
-        self.assertContains(response, '?page=2&amp;topic={}'.format(self.topic.pk))
-        second = self.client.get(self.url, {'topic': self.topic.pk, 'page': 2})
-        self.assertEqual(len(second.context['posts']), 2)
-        self.assertNotIn(self.uncategorized, response.context['posts'])
-
-    def test_all_includes_uncategorized_and_cross_stream_posts(self):
+    def test_filter_uses_distinct_ids_and_preserves_original_titles(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.context['paginator'].count, 19)
-        self.assertIsNone(response.context['selected_topic'])
+        self.assertEqual(response.status_code, 200)
+        for topic in self.topics:
+            self.assertContains(response, '<label for="topic-{}">{}</label>'.format(topic.pk, topic.title), html=True)
+            self.assertContains(response, 'id="topic-{}"'.format(topic.pk), count=2)
+            self.assertContains(response, 'div:not(.topic-{})'.format(topic.pk))
+            self.assertContains(response, 'class="topic  topic-{} "'.format(topic.pk))
+        self.assertNotContains(response, '?topic=')
+        self.assertContains(response, 'id="All" name="r1" checked')
+        self.assertEqual(len(response.context['posts']), 4)
 
-    def test_invalid_or_other_stream_topic_is_not_selected(self):
-        for value in ('bad', '99999999', str(self.other_topic.pk)):
-            with self.subTest(topic=value):
-                self.assertEqual(self.client.get(self.url, {'topic': value}).status_code, 404)
+    def test_stale_topic_url_does_not_filter_server_side(self):
+        response = self.client.get(self.url, {'topic': self.topics[0].pk})
+        self.assertEqual(len(response.context['posts']), 4)
