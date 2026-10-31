@@ -21,35 +21,87 @@ import user_topics.servisec  # Register the Topic -> Category creation signal.
 ARTICLES = [
     ('A learning journal that grows with you', 'Development', ['Learning systems', 'Заметки'],
      'Turn a single useful observation into a connected collection of ideas.',
-     'Start small', 'A good learning journal begins with a concrete question. Write down what you tried, what happened, and what you would change next time.',
+     'Start small', 'A good learning journal begins with a <strong>concrete question</strong>. Write down what you tried, what happened, and what you would change next time.',
      'Connect the ideas', 'Give the article a home in a stream, then attach the topics that help you find it again. A note about a database experiment can also belong to a broader learning practice.',
      'Make room for discussion', 'A reply can challenge an assumption or suggest the next experiment. Keeping that exchange beside the article makes the reasoning easier to revisit.'),
     ('Why database relationships matter', 'Development', ['Databases', 'Learning systems'],
      'Model the relationship first; the interface becomes easier to reason about.',
-     'One home, several connections', 'An article has a primary stream but can belong to more than one topic. A many-to-many relationship keeps these connections explicit without duplicating the article.',
+     'One home, several connections', 'An article has <strong>one primary stream</strong> but can belong to <em>more than one topic</em>. A many-to-many relationship keeps these connections explicit without duplicating the article.',
      'Separate structure from presentation', 'The same article can appear in a personal blog, a topic gallery, and the public feed. Each view answers a different question using the same stored content.',
      'Ask a useful question', 'Before adding a field, ask which operation needs it. Relationships should explain the product, not merely mirror the layout of one screen.'),
     ('Reading an API as a product contract', 'Development', ['Databases', 'Заметки'],
      'A small API is easier to trust when its permissions match its purpose.',
-     'Name the capability', 'A feed reads articles. A like action records a reaction. Keeping these capabilities distinct makes the interface and its permissions easier to understand.',
+     'Name the capability', 'A feed <strong>reads articles</strong>. A like action <em>records a reaction</em>. Keeping these capabilities distinct makes the interface and its permissions easier to understand.',
      'Test two perspectives', 'Try the same operation as the author and as another reader. A successful request for one person does not imply that the other person should be allowed to make it.',
      'Keep the feedback close', 'Document the expected behavior beside a focused test. Future changes can then preserve the original intent without relying on memory.'),
     ('The opportunity cost of an afternoon', 'Economics', ['Decision making', 'Learning systems'],
      'Time spent on one project is time unavailable to another: make that tradeoff visible.',
-     'List the alternatives', 'An afternoon can go toward reading, building, or resting. Opportunity cost is the value of the next-best alternative, not simply the money spent.',
+     'List the alternatives', 'An afternoon can go toward reading, building, or resting. Opportunity cost is the value of the <em>next-best alternative</em>, not simply the money spent.',
      'Use a small experiment', 'When the outcome is uncertain, a short experiment can reveal more than a long debate. Choose a time limit and write down what evidence would change your mind.',
      'Review the choice', 'Compare your expectations with the result. A useful decision journal records the information available at the time, rather than judging only the eventual outcome.'),
     ('Compound learning, one week at a time', 'Economics', ['Decision making', 'Заметки'],
      'A weekly review can turn scattered effort into an improving system.',
-     'Collect the signals', 'Choose three notes from the week: something learned, something misunderstood, and a question worth exploring. Link them to the relevant topics.',
+     'Collect the signals', 'Choose <strong>three notes</strong> from the week: something learned, something misunderstood, and a question worth exploring. Link them to the relevant topics.',
      'Revisit instead of restart', 'Returning to an earlier explanation reveals gaps that were invisible when you first wrote it. Improving an existing article is often more valuable than starting another.',
      'Share a specific question', 'Ask a reader to inspect one claim or example. A focused discussion creates a useful next step for both people.'),
     ('From a prototype to a shared notebook', 'Development', ['Learning systems', 'Databases'],
      'A working notebook becomes more valuable when another person can follow the reasoning.',
-     'Show the complete path', 'A useful prototype lets someone move from a stream to a topic, open an article, and join a discussion. The connections matter as much as any individual screen.',
+     'Show the complete path', 'A useful prototype lets someone move from a stream to a topic, open an article, and join a discussion. <strong>The connections matter</strong> as much as any individual screen.',
      'Leave evidence', 'Screenshots, examples, and small tests help the next reader reproduce the result. Explain the constraints as carefully as the happy path.',
      'Keep ownership clear', 'Publishing and maintaining software are different stages. Preserve the original work while making installation and its current limitations understandable.'),
 ]
+
+
+# Ordinary CKEditor HTML: these examples remain editable in the visual editor.
+ARTICLE_EXAMPLES = [
+    """<h3>A five-minute writing routine</h3>
+    <ol><li><strong>Ask:</strong> what surprised me today?</li>
+    <li><strong>Explain:</strong> describe one example in your own words.</li>
+    <li><strong>Connect:</strong> choose two topics that make the note easy to rediscover.</li></ol>
+    <blockquote><p>A useful note leaves your future self a starting point, not just a record of the past.</p></blockquote>
+    <p><span style="background-color:#fff3cd">Try it today:</span> write one paragraph before opening another tutorial.</p>""",
+    """<h3>A small relationship map</h3>
+    <table border="1" cellpadding="8" cellspacing="0" style="width:100%">
+    <caption>One article, several ways to find it</caption>
+    <thead><tr><th scope="col">Relationship</th><th scope="col">Example</th></tr></thead>
+    <tbody><tr><td>Primary stream</td><td>Development</td></tr>
+    <tr><td>Topics</td><td>Databases + Learning systems</td></tr>
+    <tr><td>Discussion</td><td>One shared comment tree</td></tr></tbody></table>
+    <p><em>Design question:</em> if a topic changes, should the article itself be duplicated?</p>""",
+    """<h3>Write down the contract</h3>
+    <pre>GET /general_page_api/v1/posts/
+POST /like_api/v1/posts/1/like/
+POST /like_api/v1/posts/1/unlike/</pre>
+    <ul><li><strong>Read:</strong> discover published articles.</li>
+    <li><strong>React:</strong> add or remove your own like.</li>
+    <li><strong>Own:</strong> edit content only with the appropriate author permissions.</li></ul>
+    <p>Compare the routes with the <a href="https://www.django-rest-framework.org/api-guide/viewsets/">Django REST Framework viewset documentation</a>.</p>""",
+    """<h3>Compare the next-best alternatives</h3>
+    <table border="1" cellpadding="8" cellspacing="0" style="width:100%">
+    <thead><tr><th scope="col">An afternoon spent on...</th><th scope="col">What you gain</th><th scope="col">What you postpone</th></tr></thead>
+    <tbody><tr><td>Building a prototype</td><td>Practical feedback</td><td>Reading the next chapter</td></tr>
+    <tr><td>Reading a chapter</td><td>A broader mental model</td><td>Testing the idea</td></tr></tbody></table>
+    <blockquote><p>The useful comparison is between the options actually available to you.</p></blockquote>""",
+    """<h3>A weekly review checklist</h3>
+    <ul><li>Revisit <strong>one explanation</strong> and improve its example.</li>
+    <li>Mark an uncertain claim in <em>italics</em> so you remember to investigate it.</li>
+    <li>Ask a reader for a counterexample.</li></ul>
+    <hr><p><span style="color:#236b5e"><strong>Next week's experiment:</strong></span> revisit one old article before writing a new one.</p>""",
+    """<h3>A reader's route through the notebook</h3>
+    <ol><li>Open a stream and select a topic.</li>
+    <li>Read an article and follow its related categories.</li>
+    <li>Leave a question; reply where the conversation already lives.</li></ol>
+    <blockquote><p>Make the reasoning visible enough that someone else can continue it.</p></blockquote>
+    <p><strong>Author's note:</strong> headings, lists, links, tables, quotes, and images can all be edited with the article's rich-text toolbar.</p>""",
+]
+
+
+def article_body(article, index):
+    _, _, _, _, h1, p1, h2, p2, h3, p3 = article
+    body = '<h2>{}</h2><p>{}</p>{}<h2>{}</h2><p>{}</p><h2>{}</h2><p>{}</p>'.format(
+        h1, p1, ARTICLE_EXAMPLES[index], h2, p2, h3, p3)
+    body += '<p><img src="{}demo/covers/{:02d}.png" alt="Abstract connected notes" style="max-width:100%"></p>'.format(settings.MEDIA_URL, index + 1)
+    return body
 
 
 def make_cover(path, index):
@@ -110,8 +162,7 @@ class Command(BaseCommand):
                 title, stream, tags, header, h1, p1, h2, p2, h3, p3 = article
                 image_name = 'demo/covers/{:02d}.png'.format(index + 1)
                 make_cover(media / image_name, index)
-                body = '<h2>{}</h2><p>{}</p><h2>{}</h2><p>{}</p><h2>{}</h2><p>{}</p>'.format(h1, p1, h2, p2, h3, p3)
-                body += '<p><img src="{}{}" alt="Abstract connected notes" style="max-width:100%"></p>'.format(settings.MEDIA_URL, image_name)
+                body = article_body(article, index)
                 owner = reader if index == 5 else author
                 post = Post.objects.create(user=owner, knowledge_field=reader_stream if index == 5 else streams[stream], title=title, header=header, body=body, image=image_name, pinned=index < 4)
                 if owner == author:

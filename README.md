@@ -33,6 +33,16 @@ The shared feed brings together writing from different authors, with topic links
 
 ![StudyFlux feed with fictional articles](docs/images/feed.png)
 
+### Write with a visual editor
+
+The demo articles use headings, bold and italic text, ordered and unordered lists, quotations, highlighted notes, links, tables, code samples, and embedded images. Open **Blog → Edit article** as `demo` to try the rich-text toolbar. The editor below is shown in its built-in fullscreen mode.
+
+![Rich-text editor with a formatted demo article and its toolbar](docs/images/editor.png)
+
+The same content becomes a formatted reading page:
+
+![Published demo article with headings, emphasis, and a numbered list](docs/images/article.png)
+
 ### Follow a topic without losing context
 
 Selecting **Databases** keeps matching articles clear and the others visible in the background.
