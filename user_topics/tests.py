@@ -26,6 +26,8 @@ class TopicFilterTests(TestCase):
             self.assertContains(response, 'id="topic-{}"'.format(topic.pk), count=2)
             self.assertContains(response, 'div:not(.topic-{})'.format(topic.pk))
             self.assertContains(response, 'class="topic  topic-{} "'.format(topic.pk))
+        self.assertContains(response, 'filter: blur(4px);')
+        self.assertNotContains(response, 'display: none;')
         self.assertNotContains(response, '?topic=')
         self.assertContains(response, 'id="All" name="r1" checked')
         self.assertEqual(len(response.context['posts']), 4)

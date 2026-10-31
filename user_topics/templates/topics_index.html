@@ -12,7 +12,7 @@
     <style>
         {% for topic in object_list %}
             input[id="topic-{{ topic.0.pk }}"]:checked ~ .cards_topics > div:not(.topic-{{ topic.0.pk }}) {
-                display: none;
+                filter: blur(4px);
             }
         {% endfor %}
     </style>
