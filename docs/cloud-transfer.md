@@ -26,7 +26,7 @@ When finished:
 2. Wait for the cloud service to finish uploading `sync/database.dump` and `media/`.
 3. On the other Mac, wait for those files to finish downloading before launching.
 
-The default website and database ports are `8000` and `55432`, both on localhost. Stop other StudyFlux instances using those ports, or set `STUDYFLUX_WEB_PORT` and `STUDYFLUX_DB_PORT` to an unused pair.
+The default website and database ports are `8000` and `55432`, both on localhost. Occupied ports are skipped automatically. The launcher prints the chosen address and opens the browser after the website is ready. Repeating the command for the same runtime reopens the running site. Set `STUDYFLUX_WEB_PORT` and `STUDYFLUX_DB_PORT` to prefer another pair, or `STUDYFLUX_OPEN_BROWSER=0` to skip opening the browser.
 
 ## What the protection does
 

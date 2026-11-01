@@ -6,10 +6,11 @@ import os
 from pathlib import Path
 import shutil
 import signal
-import socket
 import subprocess
 import sys
 import uuid
+
+from launcher_utils import choose_port, ready as website_ready, reopen_running
 
 import pgserver
 import psycopg2
@@ -93,11 +94,13 @@ def interrupt(signum, frame):
 
 
 def main():
+    global PORT, WEBPORT
     lock = (RUNTIME / 'launcher.lock').open('w')
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
-        raise RuntimeError('StudyFlux уже запущен на этом Mac.')
+        return reopen_running(RUNTIME)
+    (RUNTIME / 'running-web.json').unlink(missing_ok=True)
     if not SNAPSHOT.is_file():
         raise RuntimeError('Нет sync/database.dump. Скачайте всю папку StudyFlux из облака, затем повторите запуск.')
     state = json.loads(STATE.read_text()) if STATE.exists() else {}
@@ -109,10 +112,8 @@ def main():
         status = subprocess.run([str(BIN / 'pg_ctl'), '-D', str(DATA), 'status'], stdout=subprocess.DEVNULL)
         if status.returncode == 0:
             run('pg_ctl', '-D', DATA, '-m', 'fast', '-w', 'stop')
-    for port in (PORT, WEBPORT):
-        with socket.socket() as sock:
-            if sock.connect_ex(('127.0.0.1', port)) == 0:
-                raise RuntimeError(f'Порт {port} занят. Остановите предыдущую копию приложения.')
+    PORT = choose_port(PORT, 'PostgreSQL')
+    WEBPORT = choose_port(WEBPORT, 'Website', excluded=(PORT,))
     fresh_database = not (DATA / 'PG_VERSION').exists()
     if fresh_database:
         run('initdb', '-D', DATA, '-U', USER, '--auth=trust', '--encoding=UTF8', '--locale=C')
@@ -136,10 +137,12 @@ def main():
         subprocess.run([sys.executable, 'manage.py', 'migrate', '--noinput'], check=True, env=env)
         print(f'\nStudyFlux: http://127.0.0.1:{WEBPORT}/\nCtrl+C — сохранить данные для другого Mac и остановить приложение.\nКоды регистрации выводятся сюда.\n', flush=True)
         server = subprocess.Popen([sys.executable, 'manage.py', 'runserver', f'127.0.0.1:{WEBPORT}', '--noreload'], env=env)
+        website_ready(server, RUNTIME, WEBPORT)
         code = server.wait()
     except KeyboardInterrupt:
         pass
     finally:
+        (RUNTIME / 'running-web.json').unlink(missing_ok=True)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         if server is not None and server.poll() is None:

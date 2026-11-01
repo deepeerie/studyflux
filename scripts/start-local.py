@@ -4,9 +4,10 @@ import json
 import os
 from pathlib import Path
 import signal
-import socket
 import subprocess
 import sys
+
+from launcher_utils import choose_port, ready as website_ready, reopen_running
 
 import pgserver
 import psycopg2
@@ -28,28 +29,31 @@ def interrupt(signum, frame):
 
 
 def main():
+    global DB_PORT, WEB_PORT
     os.chdir(ROOT)
     os.umask(0o077)
     RUNTIME.mkdir(parents=True, exist_ok=True)
-    lock = (RUNTIME / 'launcher.lock').open('w')
-    try:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except BlockingIOError:
-        raise RuntimeError('This checkout is already running. Stop it with Ctrl+C first.')
     manage = sys.argv[1:2] == ['--manage']
     if sys.argv[1:] and not manage:
         raise RuntimeError('Usage: bash start.sh [--manage <Django command> ...]')
     if manage and len(sys.argv) < 3:
         raise RuntimeError('Provide a Django command after --manage.')
+    lock = (RUNTIME / 'launcher.lock').open('w')
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        if manage:
+            raise RuntimeError('Stop this copy in its original terminal before running a Django management command.')
+        return reopen_running(RUNTIME)
+    (RUNTIME / 'running-web.json').unlink(missing_ok=True)
     # A stale pid file after a crash must not prevent PostgreSQL recovery.
     if (DATA / 'PG_VERSION').exists():
         running = run('pg_ctl', '-D', DATA, 'status', stdout=subprocess.DEVNULL).returncode == 0
         if running:
             run('pg_ctl', '-D', DATA, '-m', 'fast', '-w', 'stop', check=True)
-    for port in ([DB_PORT] if manage else [DB_PORT, WEB_PORT]):
-        with socket.socket() as sock:
-            if sock.connect_ex(('127.0.0.1', port)) == 0:
-                raise RuntimeError(f'Port {port} is busy. Stop the other app, or set STUDYFLUX_DB_PORT and STUDYFLUX_WEB_PORT.')
+    DB_PORT = choose_port(DB_PORT, 'PostgreSQL')
+    if not manage:
+        WEB_PORT = choose_port(WEB_PORT, 'Website', excluded=(DB_PORT,))
     if not (DATA / 'PG_VERSION').exists():
         run('initdb', '-D', DATA, '-U', 'studyflux', '--auth=trust', '--encoding=UTF8', '--locale=C', check=True)
     env = os.environ.copy()
@@ -80,10 +84,12 @@ def main():
             print(f"\nDemo login: {login['username']}\nDemo password: {login['password']}", flush=True)
         print(f'\nStudyFlux: http://127.0.0.1:{WEB_PORT}/\nData: {RUNTIME}\nRegistration codes appear here (no email is sent).\nCtrl+C stops the app and database.\n', flush=True)
         server = subprocess.Popen([sys.executable, 'manage.py', 'runserver', f'127.0.0.1:{WEB_PORT}', '--noreload'], env=env)
+        website_ready(server, RUNTIME, WEB_PORT)
         return server.wait()
     except KeyboardInterrupt:
         return 0
     finally:
+        (RUNTIME / 'running-web.json').unlink(missing_ok=True)
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         if server is not None and server.poll() is None:

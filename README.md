@@ -88,7 +88,7 @@ cd studyflux
 bash start.sh
 ```
 
-Open **http://127.0.0.1:8000/** after the terminal prints the address. Keep that terminal open while using the app.
+The launcher opens your browser once the website is ready. The usual address is **http://127.0.0.1:8000/**; if that port is occupied, use the actual address printed in the terminal. Keep that terminal open while using the app.
 
 The first run downloads a pinned **uv 0.13.6**, **Python 3.9.25**, and Python dependencies, including **pgserver 0.1.4** with its PostgreSQL binaries. It initializes the database, applies migrations, and adds the demo. You do not need to install Python, PostgreSQL, Docker, or Node yourself. An internet connection is needed for the initial downloads and for external assets used by some legacy pages.
 
@@ -112,11 +112,13 @@ The normal launcher keeps Python, dependencies, PostgreSQL data, generated crede
 
 The ID is derived from the project's absolute path. Different clones get separate databases. Moving or renaming the project changes that ID and therefore starts a separate local database; it does not delete the old one.
 
-Both services listen only on localhost. The default ports are `8000` for the website and `55432` for PostgreSQL. If another process uses them, the launcher exits with a clear error. To use another pair:
+Both services listen only on localhost. The default ports are `8000` for the website and `55432` for PostgreSQL. If a port is occupied, the launcher automatically chooses the next available port and prints the actual address. Running the same checkout again reopens its existing website without starting another database. To prefer another pair:
 
 ```sh
 STUDYFLUX_WEB_PORT=8001 STUDYFLUX_DB_PORT=55433 bash start.sh
 ```
+
+Set `STUDYFLUX_OPEN_BROWSER=0` to skip automatic browser opening. If macOS cannot open a browser, the address remains available in the terminal.
 
 **Verified locally on an Apple Silicon Mac.** Intel macOS compatibility is expected from the dependency packages but has not been tested on Intel hardware. The launcher currently rejects other operating systems.
 
@@ -145,6 +147,8 @@ With the app stopped, run Django commands through the managed environment:
 
 ```sh
 bash start.sh --manage test
+# Launcher checks (using the managed Python or another installed Python 3):
+python3 scripts/test_launcher_utils.py
 bash start.sh --manage makemigrations --check --dry-run
 ```
 

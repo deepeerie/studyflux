@@ -6,7 +6,7 @@ The macOS setup was verified on Apple Silicon using a clean export of the files 
 
 - First `bash start.sh`: download uv and Python, install pinned dependencies, initialize bundled PostgreSQL, apply migrations, seed six articles and two non-administrator accounts, serve the compiled frontend.
 - Restart: retain articles, a comment submitted in the browser, and the original demo credentials; do not reseed existing accounts.
-- Shutdown and conflicts: Ctrl+C stops both services; an occupied database port yields a clear error rather than attaching to the other service.
+- Shutdown and conflicts: Ctrl+C stops both services; occupied website and database ports are skipped automatically; repeating the command reuses the existing website without starting another database. Launcher tests also cover invalid port values and a server that exits before becoming ready.
 - Django test suite: registration and confirmation, login, Cyrillic topic creation, article create/edit and cover upload, editor upload, root comments and replies, cross-article parent rejection, comment escaping, like/unlike, pagination, topic links, ownership checks, and idempotent demo seeding.
 - Browser inspection: demo login, article feed and images, profile, topic selection/highlight/blur, nested comments, and submitting a reply.
 - Cloud mode on two isolated runtimes with fictional data: restore a snapshot, export edits, restore those edits on the other runtime, return to the first runtime, reject a changed snapshot without overwriting it, retain a recovery dump, and refuse an unresolved conflict on restart.
